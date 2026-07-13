@@ -1,14 +1,10 @@
-const { Given, When, Then } = require("@cucumber/cucumber");
+const { When, Then } = require("@cucumber/cucumber");
 const SearchPage = require("../../pages/SearchPage");
 
 let searchPage;
 
-Given("user is on home page", async function () {
-  searchPage = new SearchPage(this.page);
-  await searchPage.openHomePage();
-});
-
 When("user clicks on search icon", async function () {
+  searchPage = new SearchPage(this.page);
   await searchPage.clickSearchIcon();
 });
 

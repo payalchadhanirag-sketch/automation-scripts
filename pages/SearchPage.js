@@ -28,9 +28,8 @@ class SearchPage {
 
   async verifyNoSearchResults() {
     await expect(this.page.locator(this.noResultText)).toBeVisible();
-
     await expect(this.page.locator(this.recommendedProducts)).toContainText(
-      "Recommended products",
+      "Produits recommandés",
     );
   }
 }

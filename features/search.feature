@@ -1,6 +1,6 @@
 Feature: Search
 
-@valid
+@search @valid
 Scenario: Search valid product
 Given user is on home page
 When user clicks on search icon
@@ -8,7 +8,7 @@ And user enters "lunettes" in search field
 Then user should see search results
 
 
-@invalid
+@search @invalid
 Scenario: Search invalid product
 Given user is on home page
 When user clicks on search icon
