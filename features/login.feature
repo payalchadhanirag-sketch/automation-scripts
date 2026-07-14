@@ -40,6 +40,17 @@ Feature: Login
     When user clicks on logout link
     Then user should be logged out successfully
 
+@forgotPassword
+  Scenario: User can request password reset
+    Given user is on home page
+    When user clicks on profile icon
+    And user enters "tester@mailinator.com" in email field
+    And user clicks on continue button
+    And user clicks on forgot password link
+    And user enters "tester@mailinator.com" in forgot password email field
+    And user clicks on send reset link button
+    Then user should see password reset confirmation message
+
 
 @login @social @google
   Scenario: Google login button redirects correctly
@@ -61,3 +72,5 @@ Feature: Login
     When user clicks on profile icon
     And user clicks on Facebook login button
     Then user should be redirected to Facebook sign-in page
+
+  

@@ -7,10 +7,10 @@ let page;
 Before(async function () {
   browser = await chromium.launch({
     headless: false,
-    args: ["--lang=en-US"],
+    args: ["--lang=fr-FR"], // en-US se fr-FR kiya
   });
   const context = await browser.newContext({
-    locale: "en-US",
+    locale: "fr-FR", // en-US se fr-FR kiya
   });
 
   page = await context.newPage();

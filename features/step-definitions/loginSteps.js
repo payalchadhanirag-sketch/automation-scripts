@@ -74,3 +74,22 @@ When("user clicks on logout link", async function () {
 Then("user should be logged out successfully", async function () {
   await loginPage.verifyLoggedOut();
 });
+
+When("user clicks on forgot password link", async function () {
+  await loginPage.clickForgotPasswordLink();
+});
+
+When(
+  "user enters {string} in forgot password email field",
+  async function (email) {
+    await loginPage.enterForgotPasswordEmail(email);
+  },
+);
+
+When("user clicks on send reset link button", async function () {
+  await loginPage.clickSendResetButton();
+});
+
+Then("user should see password reset confirmation message", async function () {
+  await loginPage.verifyResetConfirmation();
+});
