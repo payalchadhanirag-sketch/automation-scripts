@@ -152,7 +152,32 @@ class LoginPage {
   async verifyInvalidLoginError() {
     await expect(this.invalidPassError).toBeVisible();
   }
+  async verifyPasswordPromptForExistingEmail() {
+    const isRegistrationForm = await this.page
+      .getByText("Mme *")
+      .isVisible()
+      .catch(() => false);
 
+    const passwordVisible = await this.page
+      .locator('input[type="password"]:visible')
+      .first()
+      .isVisible()
+      .catch(() => false);
+
+    console.log("Is registration form shown:", isRegistrationForm);
+    console.log("Is password field shown:", passwordVisible);
+
+    if (!isRegistrationForm && passwordVisible) {
+      console.log(
+        "CONFIRMED: Email is already registered - site redirected to login (password) form instead of registration form",
+      );
+    }
+
+    assert.ok(
+      !isRegistrationForm && passwordVisible,
+      "Expected to be prompted for password (existing account), but registration form appeared instead",
+    );
+  }
   async verifyCannotProceedWithInvalidEmail() {
     await this.emailInput.waitFor({ state: "visible", timeout: 5000 });
     const isInvalid = await this.emailInput.evaluate(
@@ -297,6 +322,27 @@ class LoginPage {
       await cookieBtn.click();
       console.log("Cookie banner dismissed");
     }
+  }
+
+  async verifyPasswordPromptForExistingEmail() {
+    const isRegistrationForm = await this.page
+      .getByText("Mme *")
+      .isVisible()
+      .catch(() => false);
+
+    const passwordVisible = await this.page
+      .locator('input[type="password"]:visible')
+      .first()
+      .isVisible()
+      .catch(() => false);
+
+    console.log("Is registration form shown:", isRegistrationForm);
+    console.log("Is password field shown:", passwordVisible);
+
+    assert.ok(
+      !isRegistrationForm && passwordVisible,
+      "Expected to be prompted for password (existing account), but registration form appeared instead",
+    );
   }
 }
 

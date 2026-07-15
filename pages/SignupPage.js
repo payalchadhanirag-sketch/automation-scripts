@@ -197,7 +197,33 @@ class SignupPage {
     }
 
     await this.dismissAxeptioOverlay();
-    await this.clickValidateAccountButton();
+
+    await this.validateAccountButton.click();
+  }
+
+  async verifyRequiredFieldErrors() {
+    const stillOnForm = await this.civilityMme.isVisible().catch(() => false);
+    console.log("Still on registration form after empty submit:", stillOnForm);
+
+    await this.page.screenshot({
+      path: "missing-fields-debug.png",
+      fullPage: true,
+    });
+
+    const errorTexts = await this.page
+      .locator("[class*='error'], .alert-danger, [class*='invalid']")
+      .allInnerTexts();
+    console.log("All validation error messages found on page:", errorTexts);
+    const nameInvalid = await this.lastNameInput
+      .evaluate((el) => !el.checkValidity())
+      .catch(() => null);
+    console.log("Name field invalid (native validation):", nameInvalid);
+
+    if (!stillOnForm) {
+      throw new Error(
+        "Expected to remain on registration form due to missing fields, but form was submitted",
+      );
+    }
   }
   async fillFormWithInvalidEmail(details) {
     await this.civilityMme.click();
@@ -220,24 +246,129 @@ class SignupPage {
     await this.countryDropdown.click();
     await this.page.getByRole("option", { name: details.country }).click();
 
+    await this.dayDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.day }).click();
+    await this.monthDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.month }).click();
+    await this.yearDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.year }).click();
+
+    // Invalid email format
     await this.accountEmailInput.click();
     await this.accountEmailInput.fill(details.invalidEmail);
     await this.confirmEmailInput.click();
     await this.confirmEmailInput.fill(details.invalidEmail);
 
+    await this.passwordInput.click();
+    await this.passwordInput.fill(details.password);
+    await this.confirmPasswordInput.click();
+    await this.confirmPasswordInput.fill(details.password);
+
     await this.dismissAxeptioOverlay();
+
+    await this.phoneInput.click();
+    await this.countrySelectedDropdown.click();
+    await this.phoneCountrySearch.click();
+    await this.phoneCountrySearch.fill(details.phoneCountry);
+    await this.page.getByRole("option", { name: "India", exact: true }).click();
+    await this.phoneInput.click();
+    await this.phoneInput.fill(details.phone);
+
+    await this.dismissAxeptioOverlay();
+    await this.offerCheckbox.click();
 
     await this.clickValidateAccountButton();
   }
 
   async verifyCannotSubmitInvalidEmailForm() {
+    await this.page.screenshot({
+      path: "invalid-email-format-debug.png",
+      fullPage: true,
+    });
+
     const stillOnForm = await this.civilityMme.isVisible().catch(() => false);
     console.log("Still on registration form after submit:", stillOnForm);
+
+    const errorTexts = await this.page
+      .locator("[class*='error'], .alert-danger, [class*='invalid']")
+      .allInnerTexts();
+    console.log("All error messages found on page:", errorTexts);
 
     assert.ok(
       stillOnForm,
       "Expected to remain on registration form due to invalid email, but form was submitted successfully",
     );
+  }
+  async changeEmailToExistingInForm(existingEmail) {
+    await this.accountEmailInput.click();
+    await this.accountEmailInput.fill("");
+    await this.accountEmailInput.fill(existingEmail);
+
+    await this.confirmEmailInput.click();
+  }
+  async fillRegistrationFormWithExistingEmail(details) {
+    await this.civilityMme.click();
+    await this.lastNameInput.click();
+    await this.lastNameInput.fill(details.lastName);
+    await this.firstNameInput.click();
+    await this.firstNameInput.fill(details.firstName);
+
+    if (await this.closeConsentBanner.isVisible().catch(() => false)) {
+      await this.closeConsentBanner.click();
+    }
+
+    await this.addressInput.click();
+    await this.addressInput.fill(details.address);
+    await this.postalCodeInput.click();
+    await this.postalCodeInput.fill(details.postalCode);
+    await this.cityInput.click();
+    await this.cityInput.fill(details.city);
+
+    await this.countryDropdown.click();
+    await this.page.getByRole("option", { name: details.country }).click();
+
+    await this.dayDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.day }).click();
+    await this.monthDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.month }).click();
+    await this.yearDropdown.click();
+    await this.page.getByRole("option", { name: details.dob.year }).click();
+
+    await this.accountEmailInput.click();
+    await this.accountEmailInput.fill("");
+    await this.accountEmailInput.fill(details.existingEmail);
+
+    await this.confirmEmailInput.click();
+    await this.confirmEmailInput.fill(details.existingEmail);
+
+    await this.passwordInput.click();
+    await this.passwordInput.fill(details.password);
+    await this.confirmPasswordInput.click();
+    await this.confirmPasswordInput.fill(details.password);
+
+    await this.dismissAxeptioOverlay();
+
+    await this.phoneInput.click();
+    await this.countrySelectedDropdown.click();
+    await this.phoneCountrySearch.click();
+    await this.phoneCountrySearch.fill(details.phoneCountry);
+    await this.page.getByRole("option", { name: "India", exact: true }).click();
+    await this.phoneInput.click();
+    await this.phoneInput.fill(details.phone);
+
+    await this.dismissAxeptioOverlay();
+    await this.offerCheckbox.click();
+
+    await this.clickValidateAccountButton();
+  }
+
+  async verifyEmailAlreadyUsedError() {
+    const errorLocator = this.page
+      .getByText("Il y déjà une compte associé à cet email")
+      .first();
+
+    await errorLocator.waitFor({ state: "visible", timeout: 10000 });
+    console.log("CONFIRMED: 'Email already used' error is shown correctly");
   }
 }
 

@@ -66,13 +66,29 @@ Then("user should see a password mismatch error", async function () {
   await signupPage.verifyPasswordMismatchError();
 });
 
-Then(
-  "user should see invalid credentials error for existing account",
+When(
+  "user changes email to an already registered one in registration form",
   async function () {
-    loginPage = new LoginPage(this.page);
-    await loginPage.verifyInvalidLoginError();
+    signupPage = new SignupPage(this.page);
+    await signupPage.fillRegistrationFormWithExistingEmail({
+      lastName: "Chadha",
+      firstName: "Payal",
+      address: "Mohali",
+      postalCode: "75001",
+      city: "Paris",
+      country: "Inde",
+      dob: { day: "02", month: "01", year: "2000" },
+      existingEmail: "tester@mailinator.com",
+      password: "Test@123",
+      phoneCountry: "ind",
+      phone: "9876543210",
+    });
   },
 );
+
+Then("user should see an email already used error", async function () {
+  await signupPage.verifyEmailAlreadyUsedError();
+});
 
 When(
   "user submits registration form with missing required fields",
@@ -97,11 +113,14 @@ When(
       postalCode: "75001",
       city: "Paris",
       country: "Inde",
+      dob: { day: "02", month: "01", year: "2000" },
       invalidEmail: "invalidemailformat",
+      password: "Test@123",
+      phoneCountry: "ind",
+      phone: "9876543210",
     });
   },
 );
-
 Then("user should not be able to submit registration form", async function () {
   await signupPage.verifyCannotSubmitInvalidEmailForm();
 });

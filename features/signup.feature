@@ -13,9 +13,10 @@ Feature: Signup
   Scenario: Signup with already registered email
     Given user is on home page
     When user clicks on profile icon
-    And user enters "tester@mailinator.com" in email field
+    And user enters a new email in email field
     And user clicks on continue button
-    Then user should see invalid credentials error for existing account
+    And user changes email to an already registered one in registration form
+    Then user should see an email already used error
 
   @signup @invalid @passwordMismatch
   Scenario: Signup with mismatched password confirmation
