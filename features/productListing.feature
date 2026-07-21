@@ -37,9 +37,10 @@ Feature: Product Listing Page Filters
     Then filtered products should be displayed
 
     Examples:
-      | brand    |
-      | Carrera  |
-      | Ray-Ban  |
+      |brand |
+      | Direct Optic |
+      | Carrera |
+      | Que Linda! |
 
   @productListing @filterPrice
   Scenario Outline: Filter products by price range
@@ -53,3 +54,65 @@ Feature: Product Listing Page Filters
       | minPrice | maxPrice |
       | 90       | 99       |
       | 50       | 150      |
+
+ @productListing @filterCharacteristics
+  Scenario Outline: Filter products by general characteristics
+    Given user is on the "Lunettes de vue" listing page
+    When user opens all filters panel
+    And user selects "Caractéristiques générales" filter option "<characteristic>"
+    And user applies the selected filters
+    Then filtered products should be displayed
+
+    Examples:
+      | characteristic  |
+      | Avec clip solaire |
+
+
+  @productListing @filterColor
+  Scenario Outline: Filter products by color
+    Given user is on the "Lunettes de vue" listing page
+    When user opens all filters panel
+    And user selects "Couleur" filter option "<color>"
+    And user applies the selected filters
+    Then filtered products should be displayed
+
+    Examples:
+      | color  |
+      | Argent |
+
+
+  @productListing @filterMaterial
+  Scenario Outline: Filter products by material
+    Given user is on the "Lunettes de vue" listing page
+    When user opens all filters panel
+    And user selects "Matière" filter option "<material>"
+    And user applies the selected filters
+    Then filtered products should be displayed
+
+    Examples:
+      | material |
+      | Acétate  |
+
+ @productListing @filterLensWidth
+Scenario Outline: Filter products by lens width
+  Given user is on the "Lunettes de vue" listing page
+  When user opens all filters panel
+  And user sets "Largeur du verre" slider range from "<minWidth>" to "<maxWidth>"
+  And user applies the selected filters
+  Then filtered products should be displayed
+
+Examples:
+  | minWidth | maxWidth |
+  | 44       | 58       |
+
+  @productListing @filterTotalWidth
+  Scenario Outline: Filter products by total frame width
+    Given user is on the "Lunettes de vue" listing page
+    When user opens all filters panel
+    And user sets "Largeur totale" slider range from "<minWidth>" to "<maxWidth>"
+    And user applies the selected filters
+    Then filtered products should be displayed
+
+    Examples:
+      | minWidth | maxWidth |
+      | 128      | 142      |

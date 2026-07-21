@@ -38,3 +38,10 @@ When("user applies the selected filters", async function () {
 Then("filtered products should be displayed", async function () {
   await productListingPage.verifyFilteredProductsDisplayed();
 });
+
+When(
+  "user sets {string} slider range from {string} to {string}",
+  async function (category, min, max) {
+    await productListingPage.setSliderRange(category, min, max);
+  },
+);
