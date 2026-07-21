@@ -59,8 +59,8 @@ class NavigationPage {
     });
 
     assert.ok(
-      !currentUrl.endsWith("direct-optic.fr/") &&
-        !currentUrl.endsWith("direct-optic.fr"),
+      !currentUrl.endsWith("https://preprod.direct-optic.fr/") &&
+        !currentUrl.endsWith("https://preprod.direct-optic.fr/"),
       `Expected to navigate away from homepage after clicking "${expectedPageName}", but URL is still: ${currentUrl}`,
     );
   }

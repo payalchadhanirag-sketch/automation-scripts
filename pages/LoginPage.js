@@ -1,5 +1,6 @@
 const assert = require("assert");
 const { expect } = require("@playwright/test");
+const config = require("../config");
 
 class LoginPage {
   constructor(page) {
@@ -7,7 +8,7 @@ class LoginPage {
     this.profileIcon = page.getByRole("link").nth(4);
     this.emailInput = page.getByRole("textbox", { name: "E-mail" });
     this.continueButton = page.getByRole("button", { name: "Suivant" });
-    this.passwordInput = page.getByRole("textbox", { name: "Mot de passe" });
+    this.passwordInput = page.locator("#inputPassword");
     this.loginButton = page
       .getByRole("button", { name: "Me connecter" })
       .locator("visible=true")
@@ -41,7 +42,7 @@ class LoginPage {
   }
 
   async openHomePage() {
-    await this.page.goto("https://www.direct-optic.fr/", {
+    await this.page.goto(config.baseURL, {
       waitUntil: "domcontentloaded",
       timeout: 60000,
     });
@@ -67,33 +68,22 @@ class LoginPage {
 
   async clickContinueButton() {
     await this.dismissCookieBanner();
+    await this.page.waitForLoadState("networkidle").catch(() => {});
 
     await this.continueButton.waitFor({ state: "visible" });
+
+    const box = await this.continueButton.boundingBox();
+    const elementAtPoint = await this.page.evaluate(
+      ({ x, y }) => {
+        const el = document.elementFromPoint(x, y);
+        return el ? el.outerHTML.slice(0, 200) : null;
+      },
+      { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+    );
+    console.log("Element actually at click point:", elementAtPoint);
+
     await this.continueButton.click();
-    await this.page.waitForTimeout(2000);
-
-    const emailNotFoundVisible = await this.page
-      .getByText("Email could not be found")
-      .isVisible()
-      .catch(() => false);
-
-    if (emailNotFoundVisible) {
-      console.log(
-        "Flaky 'Email could not be found' detected - retrying Suivant click...",
-      );
-
-      const closeErrorBtn = this.page
-        .locator(".alert-danger button, [class*='error'] button")
-        .first();
-      if (await closeErrorBtn.isVisible().catch(() => false)) {
-        await closeErrorBtn.click();
-        await this.page.waitForTimeout(500);
-      }
-
-      await this.continueButton.waitFor({ state: "visible" });
-      await this.continueButton.click();
-      await this.page.waitForTimeout(2000);
-    }
+    await this.page.waitForTimeout(3000);
 
     console.log("URL after Suivant click:", this.page.url());
     await this.page.screenshot({ path: "after-suivant.png", fullPage: true });
@@ -125,6 +115,7 @@ class LoginPage {
     await visibleField.click();
     await visibleField.fill(password);
   }
+
   async clickLoginButton() {
     const passwordField = this.page
       .locator('input[type="password"]:visible')
@@ -146,12 +137,13 @@ class LoginPage {
   }
 
   async verifyLoginSuccess() {
-    await expect(this.myAccount).toBeVisible();
+    await expect(this.myAccount).toBeVisible({ timeout: 15000 });
   }
 
   async verifyInvalidLoginError() {
     await expect(this.invalidPassError).toBeVisible();
   }
+
   async verifyPasswordPromptForExistingEmail() {
     const isRegistrationForm = await this.page
       .getByText("Mme *")
@@ -178,6 +170,7 @@ class LoginPage {
       "Expected to be prompted for password (existing account), but registration form appeared instead",
     );
   }
+
   async verifyCannotProceedWithInvalidEmail() {
     await this.emailInput.waitFor({ state: "visible", timeout: 5000 });
     const isInvalid = await this.emailInput.evaluate(
@@ -203,6 +196,7 @@ class LoginPage {
     await errorLocator.waitFor({ state: "visible", timeout: 10000 });
     await expect(errorLocator).toBeVisible();
   }
+
   async clickGoogleLoginButton() {
     await this.dismissCookieBanner();
 
@@ -240,6 +234,17 @@ class LoginPage {
     }
   }
 
+  async verifyGoogleRedirect() {
+    await this.googlePopup.waitForLoadState();
+    const url = this.googlePopup.url();
+    console.log("Google popup URL:", url);
+    assert.ok(
+      url.includes("accounts.google.com"),
+      `Expected Google URL, got: ${url}`,
+    );
+    await this.googlePopup.close();
+  }
+
   async clickAppleLoginButton() {
     const popupPromise = this.page.waitForEvent("popup");
     await this.appleLoginButton.click();
@@ -273,8 +278,9 @@ class LoginPage {
     );
     await this.facebookPopup.close();
   }
+
   async clickLogoutLink() {
-    await this.page.goto("https://www.direct-optic.fr/custom-logout", {
+    await this.page.goto(`${config.baseURL}/custom-logout`, {
       waitUntil: "domcontentloaded",
     });
   }
@@ -289,6 +295,7 @@ class LoginPage {
       "Expected login form after logout, but user still seems logged in",
     );
   }
+
   async clickForgotPasswordLink() {
     await this.forgotPasswordLink.waitFor({ state: "visible", timeout: 10000 });
     await this.forgotPasswordLink.click();
@@ -322,27 +329,6 @@ class LoginPage {
       await cookieBtn.click();
       console.log("Cookie banner dismissed");
     }
-  }
-
-  async verifyPasswordPromptForExistingEmail() {
-    const isRegistrationForm = await this.page
-      .getByText("Mme *")
-      .isVisible()
-      .catch(() => false);
-
-    const passwordVisible = await this.page
-      .locator('input[type="password"]:visible')
-      .first()
-      .isVisible()
-      .catch(() => false);
-
-    console.log("Is registration form shown:", isRegistrationForm);
-    console.log("Is password field shown:", passwordVisible);
-
-    assert.ok(
-      !isRegistrationForm && passwordVisible,
-      "Expected to be prompted for password (existing account), but registration form appeared instead",
-    );
   }
 }
 

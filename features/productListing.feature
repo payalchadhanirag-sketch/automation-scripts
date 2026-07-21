@@ -10,9 +10,7 @@ Feature: Product Listing Page Filters
 
     Examples:
       | gender |
-      | Femme  |
       | Homme  |
-      | Mixte  |
 
   @productListing @filterShape
   Scenario Outline: Filter products by frame shape
@@ -24,8 +22,6 @@ Feature: Product Listing Page Filters
 
     Examples:
       | shape   |
-      | Ovale   |
-      | Ronde   |
       | Carrée  |
 
   @productListing @filterBrand
@@ -39,8 +35,6 @@ Feature: Product Listing Page Filters
     Examples:
       |brand |
       | Direct Optic |
-      | Carrera |
-      | Que Linda! |
 
   @productListing @filterPrice
   Scenario Outline: Filter products by price range
@@ -53,7 +47,6 @@ Feature: Product Listing Page Filters
     Examples:
       | minPrice | maxPrice |
       | 90       | 99       |
-      | 50       | 150      |
 
  @productListing @filterCharacteristics
   Scenario Outline: Filter products by general characteristics

@@ -32,8 +32,8 @@ class ProductListingPage {
 
     this.lensWidthSliderMin = page.locator("#rangeLensWidth1");
     this.lensWidthSliderMax = page.locator("#rangeLensWidth2");
-    this.totalWidthSliderMin = page.locator("#sliderTotalWidth-1");
-    this.totalWidthSliderMax = page.locator("#sliderTotalWidth-2");
+    this.totalWidthSliderMin = page.locator("#rangeTotalWidth1");
+    this.totalWidthSliderMax = page.locator("#rangeTotalWidth2");
     this.discountPopupClose = page.locator(".pum-close").first();
   }
 

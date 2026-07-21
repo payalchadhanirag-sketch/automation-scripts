@@ -1,21 +1,19 @@
 const { Before, After, setDefaultTimeout } = require("@cucumber/cucumber");
 const { chromium } = require("playwright");
-setDefaultTimeout(60000);
+const config = require("../../config");
+
+setDefaultTimeout(60 * 1000);
+
 let browser;
-let page;
 
 Before(async function () {
-  browser = await chromium.launch({
-    headless: false,
-    args: ["--lang=fr-FR"],
-  });
+  browser = await chromium.launch({ headless: false });
+
   const context = await browser.newContext({
-    locale: "fr-FR",
+    httpCredentials: config.httpCredentials,
   });
 
-  page = await context.newPage();
-
-  this.page = page;
+  this.page = await context.newPage();
 });
 
 After(async function () {

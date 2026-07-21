@@ -253,7 +253,6 @@ class SignupPage {
     await this.yearDropdown.click();
     await this.page.getByRole("option", { name: details.dob.year }).click();
 
-    // Invalid email format
     await this.accountEmailInput.click();
     await this.accountEmailInput.fill(details.invalidEmail);
     await this.confirmEmailInput.click();
@@ -369,6 +368,21 @@ class SignupPage {
 
     await errorLocator.waitFor({ state: "visible", timeout: 10000 });
     console.log("CONFIRMED: 'Email already used' error is shown correctly");
+  }
+
+  async verifyPasswordMismatchError() {
+    const error = this.page
+      .getByText("les mots de passes ne sont pas identiques")
+      .first();
+
+    await error.waitFor({
+      state: "visible",
+      timeout: 10000,
+    });
+
+    await expect(error).toBeVisible();
+
+    console.log("Password mismatch error displayed successfully");
   }
 }
 
